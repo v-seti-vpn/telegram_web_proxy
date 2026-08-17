@@ -18,8 +18,8 @@ ARG BASE_URL=https://${DOMAIN}/a/
 # 1. Клонируем исходный репозиторий telegram-tt
 RUN git clone --depth 1 --branch ${BRANCH} ${REPO_URL} .
 
-# 2. Копируем и запускаем скрипт патчинга (удаление dist, замена домена и query-параметров ipAddress)
-COPY patch.sh /tmp/patch.sh
+# 2. Копируем и запускаем скрипты патчинга (удаление dist, замена домена и query-параметров ipAddress)
+COPY patch.js patch.sh /tmp/
 RUN chmod +x /tmp/patch.sh && /tmp/patch.sh "${DOMAIN}" /app
 
 # 3. Установка зависимостей (и доустановка peer-зависимости @floating-ui/dom для @tiptap)
