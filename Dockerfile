@@ -22,17 +22,17 @@ RUN git clone --depth 1 --branch ${BRANCH} ${REPO_URL} .
 COPY patch.sh /tmp/patch.sh
 RUN chmod +x /tmp/patch.sh && /tmp/patch.sh "${DOMAIN}" /app
 
-# 3. Переменные окружения для сборщика Vite
+# 3. Установка зависимостей (и доустановка peer-зависимости @floating-ui/dom для @tiptap)
+RUN --mount=type=cache,target=/root/.npm \
+    (npm ci || npm install) && npm i @floating-ui/dom --no-save
+
+# 4. Переменные окружения для сборщика Vite
 ENV TELEGRAM_API_ID=${TELEGRAM_API_ID}
 ENV TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
 ENV APP_ENV=${APP_ENV}
 ENV BASE_URL=${BASE_URL}
-ENV NODE_ENV=production
 
-# 4. Установка зависимостей с кэшированием npm и сборка проекта
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --legacy-peer-deps || npm install --legacy-peer-deps
-
+# 5. Сборка проекта
 RUN npm run build:production
 
 # Stage 2: Раздача статики через Nginx
