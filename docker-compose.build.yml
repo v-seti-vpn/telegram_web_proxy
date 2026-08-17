@@ -1,0 +1,16 @@
+services:
+  telegramwebproxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DOMAIN: ${DOMAIN:-tg.vseti.top}
+        TELEGRAM_API_ID: ${TELEGRAM_API_ID:-1025907}
+        TELEGRAM_API_HASH: ${TELEGRAM_API_HASH:-452b0359b988148995f22ff0f4229750}
+        BRANCH: ${BRANCH:-master}
+        REPO_URL: ${REPO_URL:-https://github.com/Ajaxy/telegram-tt.git}
+    image: telegram-tt:latest
+    container_name: telegram-tt
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:80"
