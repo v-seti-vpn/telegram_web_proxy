@@ -4,4 +4,4 @@ services:
     container_name: telegram-tt
     restart: unless-stopped
     ports:
-      - "5002:80"
+      - "127.0.0.1:5002:80"

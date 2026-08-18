@@ -40,10 +40,10 @@ map $http_upgrade $connection_upgrade {
 
 server {
     listen 443 ssl http2;
-    server_name tg.vseti.top; # или любой ваш домен
+    server_name ДОМЕН; # или любой ваш домен
 
-    ssl_certificate     /etc/letsencrypt/live/tg.vseti.top/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/tg.vseti.top/privkey.pem;
+    ssl_certificate     .../fullchain.pem;
+    ssl_certificate_key .../privkey.pem;
 
     location / {
         proxy_pass http://127.0.0.1:5002;
@@ -63,3 +63,5 @@ server {
     }
 }
 ```
+
+По всем вопросам: https://t.me/v_seti_vpn?direct

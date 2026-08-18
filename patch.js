@@ -46,7 +46,7 @@ if (fs.existsSync(configPath)) {
   );
 
   fs.writeFileSync(configPath, configCode, 'utf8');
-  console.log('==> [2/7] src/config.ts настроен на динамический домен и захардкоженные credentials');
+  console.log('==> [2/7] src/config.ts настроен на динамический домен');
 }
 
 const viteConfigPath = path.join(targetDir, 'vite.config.ts');
@@ -142,4 +142,4 @@ if (fs.existsSync(redirectFile)) {
   console.log('==> [7/7] public/redirect.js настроен на относительный редирект ./a');
 }
 
-console.log('==> Патчинг успешно завершен! Образ теперь полностью универсален.');
+console.log('==> Патчинг успешно завершен!');
