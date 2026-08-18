@@ -1,5 +1,5 @@
-node_modules
-.git
-.cache
-dist
-telegram-tt
+**
+!Dockerfile
+!nginx.conf
+!docker-dist/
+!docker-dist/**

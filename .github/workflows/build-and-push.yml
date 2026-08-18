@@ -29,8 +29,66 @@ jobs:
       packages: write
 
     steps:
+      # Наш репозиторий: patch.js, patch.sh, nginx.conf, Dockerfile
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Исходники telegram-tt
+      - name: Checkout telegram-tt
+        uses: actions/checkout@v7
+        with:
+          repository: Ajaxy/telegram-tt
+          ref: master
+          path: upstream
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      # Кешируем именно готовый node_modules.
+      # При cache-hit npm ci вообще не запускается.
+      - name: Cache node_modules
+        id: node-modules-cache
+        uses: actions/cache@v6
+        with:
+          path: upstream/node_modules
+          key: >
+            telegram-tt-node24-${{
+              hashFiles(
+                'upstream/package.json',
+                'upstream/package-lock.json'
+              )
+            }}-floating-ui-v1
+
+      - name: Install dependencies
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        working-directory: upstream
+        run: |
+          npm ci --no-audit --no-fund
+          npm install @floating-ui/dom --no-save --no-audit --no-fund
+
+      - name: Apply patches
+        run: |
+          cp patch.js patch.sh /tmp/
+          chmod +x /tmp/patch.sh
+          /tmp/patch.sh "$GITHUB_WORKSPACE/upstream"
+
+      - name: Build frontend
+        working-directory: upstream
+        env:
+          APP_ENV: production
+        run: npm run build:production
+
+      # Оставляем Docker context практически пустым.
+      - name: Prepare Docker context
+        run: |
+          rm -rf docker-dist
+          mv upstream/dist docker-dist
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -58,12 +116,5 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-
-          build-contexts: |
-            upstream=https://github.com/Ajaxy/telegram-tt.git#master
-
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-          cache-from: type=gha,scope=telegram-tt
-          cache-to: type=gha,mode=max,scope=telegram-tt
