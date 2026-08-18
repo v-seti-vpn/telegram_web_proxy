@@ -24,7 +24,6 @@ RUN --mount=type=cache,target=/root/.npm \
 
 # 4. Переменные окружения для сборщика Vite
 ENV APP_ENV=${APP_ENV}
-ENV BASE_URL=./
 
 # 5. Сборка проекта
 RUN npm run build:production
