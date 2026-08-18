@@ -3,39 +3,33 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-# Устанавливаем git и findutils для работы patch.sh
-RUN apk add --no-cache git findutils
+# Устанавливаем git для клонирования исходного репозитория
+RUN apk add --no-cache git
 
 # Аргументы сборки
 ARG REPO_URL=https://github.com/Ajaxy/telegram-tt.git
 ARG BRANCH=master
-ARG DOMAIN=tg.vseti.top
-ARG TELEGRAM_API_ID=1025907
-ARG TELEGRAM_API_HASH=452b0359b988148995f22ff0f4229750
 ARG APP_ENV=production
-ARG BASE_URL=https://${DOMAIN}/a/
 
 # 1. Клонируем исходный репозиторий telegram-tt
 RUN git clone --depth 1 --branch ${BRANCH} ${REPO_URL} .
 
-# 2. Копируем и запускаем скрипты патчинга (удаление dist, замена домена и query-параметров ipAddress)
+# 2. Копируем и запускаем скрипты патчинга (динамический домен в runtime, инъекция credentials)
 COPY patch.js patch.sh /tmp/
-RUN chmod +x /tmp/patch.sh && /tmp/patch.sh "${DOMAIN}" /app
+RUN chmod +x /tmp/patch.sh && /tmp/patch.sh /app
 
 # 3. Установка зависимостей (и доустановка peer-зависимости @floating-ui/dom для @tiptap)
 RUN --mount=type=cache,target=/root/.npm \
     (npm ci || npm install) && npm i @floating-ui/dom --no-save
 
 # 4. Переменные окружения для сборщика Vite
-ENV TELEGRAM_API_ID=${TELEGRAM_API_ID}
-ENV TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
 ENV APP_ENV=${APP_ENV}
-ENV BASE_URL=${BASE_URL}
+ENV BASE_URL=./
 
 # 5. Сборка проекта
 RUN npm run build:production
 
-# Stage 2: Раздача статики через Nginx
+# Stage 2: Раздача статики и проксирование через Nginx
 FROM nginx:alpine
 
 # Конфигурация Nginx

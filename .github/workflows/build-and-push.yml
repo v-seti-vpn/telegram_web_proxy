@@ -59,9 +59,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            DOMAIN=${{ vars.DOMAIN || 'tg.vseti.top' }}
-            TELEGRAM_API_ID=${{ secrets.TELEGRAM_API_ID || '1025907' }}
-            TELEGRAM_API_HASH=${{ secrets.TELEGRAM_API_HASH || '452b0359b988148995f22ff0f4229750' }}
           cache-from: type=gha,scope=telegram-tt
           cache-to: type=gha,mode=max,scope=telegram-tt

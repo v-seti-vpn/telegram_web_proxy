@@ -2,7 +2,6 @@
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-DOMAIN="${1:-tg.vseti.top}"
-TARGET_DIR="${2:-.}"
+TARGET_DIR="${1:-.}"
 
-node "$SCRIPT_DIR/patch.js" "$DOMAIN" "$TARGET_DIR"
+node "$SCRIPT_DIR/patch.js" "$TARGET_DIR"
